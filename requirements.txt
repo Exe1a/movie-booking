@@ -1,0 +1,5 @@
+fastapi[standard]
+sqlalchemy
+bcrypt
+psycopg
+redis
