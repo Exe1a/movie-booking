@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import String, Boolean, DateTime, ForeignKey
+from sqlalchemy import String, Boolean, DateTime, ForeignKey, Integer, CheckConstraint
 from datetime import datetime
 
 class Base(DeclarativeBase):
@@ -24,3 +24,13 @@ class Movie(Base):
 class Movie_Genre(Base):
     __tablename__ = "movie_genre"
     genre: Mapped[str] = mapped_column(primary_key=True)
+
+class ShowTime(Base):
+    __tablename__ = "showtime"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    movie_name: Mapped[str] = mapped_column(ForeignKey("movie.name"))
+    time: Mapped[datetime] = mapped_column(DateTime())
+    number_of_seats: Mapped[int] = mapped_column(Integer())
+    reserved: Mapped[int] = mapped_column(Integer())
+
+    CheckConstraint("number_of_seats >= reserved")
