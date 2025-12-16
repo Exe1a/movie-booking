@@ -1,44 +1,44 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import String, Boolean, DateTime, ForeignKey, Integer, CheckConstraint
+from sqlalchemy import String, ForeignKey, CheckConstraint
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import date, datetime
 
 class Base(DeclarativeBase):
     pass
 
-class User(Base):
-    __tablename__ = "user"
+class Users(Base):
+    __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30), nullable=False)
     login: Mapped[str] = mapped_column(String(30), nullable=False)
     password: Mapped[str] = mapped_column(String(30), nullable=False)
-    admin: Mapped[bool] = mapped_column(Boolean, default=False)
+    admin: Mapped[bool] = mapped_column(server_default="False")
 
-class Movie(Base):
-    __tablename__ = "movie"
+class Movies(Base):
+    __tablename__ = "movies"
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(30), nullable=False)
-    description: Mapped[str] = mapped_column(String(100))
-    release: Mapped[datetime] = mapped_column(DateTime())
-    genre: Mapped[str] = mapped_column(ForeignKey("movie_genre.genre"))
+    title: Mapped[str] = mapped_column(String(30), nullable=False)
+    description: Mapped[str]
+    release: Mapped[date]
+    genre: Mapped[str] = mapped_column(ForeignKey("movies_genres.genre", ondelete="CASCADE"))
 
-class Movie_Genre(Base):
-    __tablename__ = "movie_genre"
-    genre: Mapped[str] = mapped_column(primary_key=True)
+class Movies_Genres(Base):
+    __tablename__ = "movies_genres"
+    genre: Mapped[str] = mapped_column(String(10), primary_key=True)
 
-class ShowTime(Base):
-    __tablename__ = "showtime"
+class Showtimes(Base):
+    __tablename__ = "showtimes"
     id: Mapped[int] = mapped_column(primary_key=True)
-    movie_name: Mapped[str] = mapped_column(ForeignKey("movie.name"))
-    time: Mapped[datetime] = mapped_column(DateTime())
-    number_of_seats: Mapped[int] = mapped_column(Integer())
-    reserved: Mapped[int] = mapped_column(Integer())
+    movie_id: Mapped[str] = mapped_column(ForeignKey("movies.id", ondelete="CASCADE"))
+    time: Mapped[datetime]
+    seats: Mapped[int]
+    reserved: Mapped[int] = mapped_column(default=0)
 
-    CheckConstraint("number_of_seats >= reserved")
+    CheckConstraint("seats >= reserved")
 
 class Movie_model(BaseModel):
     id: int | None = None
-    name: str | None = None
+    title: str | None = None
     description: str | None = None
-    realese: datetime | None = None
+    release: date | None = None
     genre: str | None = None
