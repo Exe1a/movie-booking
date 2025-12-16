@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from src.database import engine
+from src.database import session_maker
 from src.models import Movie, Movie_model
 
 router = APIRouter(prefix="/movie")
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/movie")
 @router.post("/{id}")
 def get_movie(filter: Movie_model):
     try:
-        with Session(engine) as session:
+        with session_maker() as session:
             return session.scalars(
                 select(Movie).where(
                     Movie.id == filter.id,
