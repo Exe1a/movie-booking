@@ -4,7 +4,7 @@ from typing import Annotated
 from src.database import session_maker
 from src.models import Movies, Movie_model
 
-router = APIRouter(prefix="/movie")
+router = APIRouter(prefix="/movie", tags=["movie"])
 
 @router.post("/")
 def get_movie(filter: Annotated[Movie_model, Query()]):

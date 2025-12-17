@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from src.database import engine
 from src.models import Base
 
-router = APIRouter(prefix="/db")
+router = APIRouter(prefix="/db", tags=["database"])
 
 @router.post("/reset")
 def db_reset():
