@@ -6,7 +6,7 @@ from src.models import Movies, Movie_model
 
 router = APIRouter(prefix="/movie", tags=["movie"])
 
-@router.post("", summary="Get all movies or some movies by id/title/description/release/genre")
+@router.post(summary="Get all movies or some movies by id/title/description/release/genre")
 def get_movie(filter: Annotated[Movie_model, Query()]):
     fields = filter.get_fields()
     whr = []
