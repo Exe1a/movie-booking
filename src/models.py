@@ -42,3 +42,12 @@ class Movie_model(BaseModel):
     description: str | None = None
     release: date | None = None
     genre: str | None = None
+
+    def get_fields(self) -> list:
+        fields = []
+        if self.id: fields.append("id")
+        if self.title: fields.append("title")
+        if self.description: fields.append("description")
+        if self.release: fields.append("release")
+        if self.genre: fields.append("genre")
+        return fields
