@@ -6,7 +6,7 @@ from src.models import Movies, Movie_model
 
 router = APIRouter(prefix="/movie", tags=["movie"])
 
-@router.post("")
+@router.post("", summary="Get all movies or some movies by id/title/description/release/genre")
 def get_movie(filter: Annotated[Movie_model, Query()]):
     fields = filter.get_fields()
     whr = []
@@ -18,7 +18,7 @@ def get_movie(filter: Annotated[Movie_model, Query()]):
     with session_maker() as session:
         return session.scalars(select(Movies).where(*whr)).all()
 
-@router.post("/add")
+@router.post("/add", summary="Add new movie in database")
 def add_movie(movie: Annotated[Movie_model, Query()]):
     fileds = movie.get_fields()
     if "id" in fileds: return {"error": "id is not necessary"}
