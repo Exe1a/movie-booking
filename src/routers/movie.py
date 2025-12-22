@@ -19,18 +19,30 @@ def get_movie(filter: Annotated[Movie_model, Query()]):
         return session.scalars(select(Movies).where(*whr)).all()
 
 @router.post("/add", summary="Add new movie in database")
-def add_movie(movie: Annotated[Movie_model, Query()]):
-    fileds = movie.get_fields()
+def add_movie(new_movie: Annotated[Movie_model, Query()]):
+    fileds = new_movie.get_fields()
     if "id" in fileds: return {"error": "id is not necessary"}
     if "title" not in fileds: return {"error": "title is necessary"}
     if "description" not in fileds: return {"error": "description is necessary"}
     if "release" not in fileds: return {"error": "release is necessary"}
     if "genre" not in fileds: return {"error": "genre is necessary"}
-    new_movie = Movies(title = movie.title,
-                       description = movie.description,
-                       release = movie.release,
-                       genre = movie.genre)
+    movie = Movies(title = new_movie.title,
+                   description = new_movie.description,
+                   release = new_movie.release,
+                   genre = new_movie.genre)
     with session_maker() as session:
-        session.add(new_movie)
+        session.add(movie)
         session.commit()
     return {"result": "movie was added"}
+
+@router.patch("/edit/{movie_id}")
+def edit_movie(movie_id: int, edited_movie: Annotated[Movie_model, Query()]):
+    fields = edited_movie.get_fields()
+    with session_maker() as session:
+        movie_to_edit = session.scalar(select(Movies).where(Movies.id == movie_id))
+        movie_to_edit.title = edited_movie.title if "title" in fields else movie_to_edit.title
+        movie_to_edit.description = edited_movie.description if "description" in fields else movie_to_edit.description
+        movie_to_edit.release = edited_movie.release if "release" in fields else movie_to_edit.release
+        movie_to_edit.genre = edited_movie.genre if "genre" in fields else movie_to_edit.genre
+        session.commit()
+    return {"result" : "movie was edited"}
