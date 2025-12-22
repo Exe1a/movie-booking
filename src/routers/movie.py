@@ -35,7 +35,7 @@ def add_movie(new_movie: Annotated[Movie_model, Query()]):
         session.commit()
     return {"result": "movie was added"}
 
-@router.patch("/edit/{movie_id}")
+@router.patch("/{movie_id}")
 def edit_movie(movie_id: int, edited_movie: Annotated[Movie_model, Query()]):
     fields = edited_movie.get_fields()
     with session_maker() as session:
@@ -46,3 +46,11 @@ def edit_movie(movie_id: int, edited_movie: Annotated[Movie_model, Query()]):
         movie_to_edit.genre = edited_movie.genre if "genre" in fields else movie_to_edit.genre
         session.commit()
     return {"result" : "movie was edited"}
+
+@router.delete("/{movie_id}")
+def delete_movie(movie_id: int):
+    with session_maker() as session:
+        movie_to_delete = session.get(Movies, movie_id)
+        session.delete(movie_to_delete)
+        session.commit()
+    return {"result": "movie was deleted"}
