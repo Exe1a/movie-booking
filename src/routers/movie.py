@@ -14,7 +14,7 @@ def get_movie(filter: Annotated[Movie_model, Query()]):
     if "title" in fields: whr.append(Movies.title == filter.title)
     if "description" in fields: whr.append(Movies.description == filter.description)
     if "release" in fields: whr.append(Movies.release == filter.release)
-    if "genre" in fields: whr.append(Movies.genre == filter.genre)
+    if "genre_id" in fields: whr.append(Movies.genre_id == filter.genre_id)
     with session_maker() as session:
         return session.scalars(select(Movies).where(*whr)).all()
 
@@ -25,11 +25,11 @@ def add_movie(new_movie: Annotated[Movie_model, Query()]):
     if "title" not in fileds: return {"error": "title is necessary"}
     if "description" not in fileds: return {"error": "description is necessary"}
     if "release" not in fileds: return {"error": "release is necessary"}
-    if "genre" not in fileds: return {"error": "genre is necessary"}
+    if "genre_id" not in fileds: return {"error": "genre_id is necessary"}
     movie = Movies(title = new_movie.title,
                    description = new_movie.description,
                    release = new_movie.release,
-                   genre = new_movie.genre)
+                   genre_id = new_movie.genre_id)
     with session_maker() as session:
         session.add(movie)
         session.commit()
@@ -43,7 +43,7 @@ def edit_movie(movie_id: int, edited_movie: Annotated[Movie_model, Query()]):
         movie_to_edit.title = edited_movie.title if "title" in fields else movie_to_edit.title
         movie_to_edit.description = edited_movie.description if "description" in fields else movie_to_edit.description
         movie_to_edit.release = edited_movie.release if "release" in fields else movie_to_edit.release
-        movie_to_edit.genre = edited_movie.genre if "genre" in fields else movie_to_edit.genre
+        movie_to_edit.genre_id = edited_movie.genre_id if "genre_id" in fields else movie_to_edit.genre_id
         session.commit()
     return {"result" : "movie was edited"}
 
