@@ -1,6 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import String, ForeignKey, CheckConstraint
-from pydantic import BaseModel
 from datetime import date, datetime
 
 class Base(DeclarativeBase):
@@ -36,19 +35,3 @@ class Showtimes(Base):
     reserved: Mapped[int] = mapped_column(server_default='0')
 
     CheckConstraint("seats >= reserved")
-
-class Movie_model(BaseModel):
-    id: int | None = None
-    title: str | None = None
-    description: str | None = None
-    release: date | None = None
-    genre_id: int | None = None
-
-    def get_fields(self) -> list:
-        fields = []
-        if self.id: fields.append("id")
-        if self.title: fields.append("title")
-        if self.description: fields.append("description")
-        if self.release: fields.append("release")
-        if self.genre_id: fields.append("genre_id")
-        return fields

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from src.database import engine
-from src.models import Base
+from models.database import Base
 
 router = APIRouter(prefix="/db", tags=["database"])
 
