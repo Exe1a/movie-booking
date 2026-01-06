@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from sqlalchemy import select
-from models.database import Movies_Genres
+from src.models.database import Movies_Genres
 from src.database import session_maker
 
 router = APIRouter(prefix="/genre", tags=["genre"])

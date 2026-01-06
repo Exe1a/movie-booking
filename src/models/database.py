@@ -33,5 +33,10 @@ class Showtimes(Base):
     time: Mapped[datetime]
     seats: Mapped[int]
     reserved: Mapped[int] = mapped_column(server_default='0')
+    __table_args__ = (CheckConstraint("seats >= reserved"),)
 
-    CheckConstraint("seats >= reserved")
+class Reservation(Base):
+    __tablename__ = "reservation"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    showtime_id: Mapped[int] = mapped_column(ForeignKey("showtimes.id", ondelete="CASCADE"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))

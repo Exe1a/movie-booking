@@ -2,8 +2,8 @@ from fastapi import APIRouter, Query
 from sqlalchemy import select
 from typing import Annotated
 from src.database import session_maker
-from models.database import Movies
-from models.pydantic_models import Movie_model
+from src.models.database import Movies
+from src.models.pydantic_models import Movie_model
 
 router = APIRouter(prefix="/movie", tags=["movie"])
 
