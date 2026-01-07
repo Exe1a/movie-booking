@@ -17,8 +17,8 @@ class Movies(Base):
     __tablename__ = "movies"
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(32), nullable=False)
-    description: Mapped[str]
-    release: Mapped[date]
+    description: Mapped[str] = mapped_column(nullable=True)
+    release: Mapped[date] = mapped_column(nullable=True)
     genre_id: Mapped[int] = mapped_column(ForeignKey("movies_genres.id", ondelete="CASCADE"))
 
 class Movies_Genres(Base):
