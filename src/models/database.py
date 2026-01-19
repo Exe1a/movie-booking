@@ -8,8 +8,7 @@ class Base(DeclarativeBase):
 class Users(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(32), nullable=False)
-    login: Mapped[str] = mapped_column(String(32), nullable=False)
+    login: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(32), nullable=False)
     admin: Mapped[bool] = mapped_column(server_default="False")
 

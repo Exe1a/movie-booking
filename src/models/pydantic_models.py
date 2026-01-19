@@ -33,3 +33,7 @@ class Showtime_model(BaseModel):
     movie_id: int
     time: datetime
     seats: int = Field(gt=0)
+
+class User_form(BaseModel):
+    login: str
+    password: str
