@@ -4,7 +4,7 @@ from typing import Annotated
 from src.database import get_session
 from src.models.database import Users
 from src.models.pydantic_models import User_form
-from src.utils import generate_token, admin_check, get_user_id
+from src.utils import generate_token, admin_check, get_user_id, hash_password, check_password
 
 router = APIRouter(prefix="/user",tags=["user"])
 
@@ -14,8 +14,9 @@ def registration(user: Annotated[User_form, Query()],
                  session = Depends(get_session)):
     if session.scalar(select(Users.login).where(Users.login == user.login)):
         raise HTTPException(409, "Login already exist")
+    hash_pd = hash_password(user.password)
     new_user = Users(login = user.login,
-                     password = user.password)
+                     password = hash_pd)
     session.add(new_user)
     session.commit()
     user_id = session.scalar(select(Users.id).where(Users.login == user.login))
@@ -27,11 +28,11 @@ def login_user(user_data: Annotated[User_form, Query()],
                response: Response,
                session = Depends(get_session)):
     error = {"error": "login or password incorrect"}
-    user = session.scalar(select(Users).where(Users.login == user_data.login))
-    if user.login == "":
+    user_from_db = session.scalar(select(Users).where(Users.login == user_data.login))
+    if user_from_db.login == "":
         return error
-    if user.password == user.password:
-        response.set_cookie("token", generate_token(user.id))
+    if check_password(user_data.password, user_from_db.password):
+        response.set_cookie("token", generate_token(user_from_db.id))
         return {"result": "Successful login"}
     return error
 
@@ -43,7 +44,7 @@ def change_password(user_id: int,
     if get_user_id(token) != user_id:
         return {"error": "You can change password only your account"}
     user = session.get(Users, user_id)
-    user.password = new_password
+    user.password = hash_password(new_password)
     session.commit()
     return {"result": "password was changed"}
 

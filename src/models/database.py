@@ -9,7 +9,7 @@ class Users(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     login: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
-    password: Mapped[str] = mapped_column(String(32), nullable=False)
+    password: Mapped[str] = mapped_column(String(64), nullable=False)
     admin: Mapped[bool] = mapped_column(server_default="False")
 
 class Movies(Base):

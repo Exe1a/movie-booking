@@ -3,6 +3,7 @@ from dotenv import dotenv_values
 from sqlalchemy.orm import Session
 
 url = str(dotenv_values(".env").get("DATABASE_URL"))
+database_reset_key = str(dotenv_values(".env").get("DATABASE_RESET_KEY"))
 
 engine = create_engine(url,
                        echo=True)

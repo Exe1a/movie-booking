@@ -1,4 +1,5 @@
 from jwt import decode, encode
+from bcrypt import hashpw, gensalt, checkpw
 from dotenv import dotenv_values
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -26,3 +27,10 @@ def admin_check(token: str | bytes) -> None:
         admin = session.scalar(select(Users.admin).where(Users.id == user_id))
     if not admin:
         raise HTTPException(403, "You are not admin")
+
+def hash_password(password: str) -> str:
+    return (hashpw(password.encode(), gensalt())).decode()
+
+def check_password(password: str,
+                   hashed_password: str) -> bool:
+    return checkpw(password.encode(), hashed_password.encode())
