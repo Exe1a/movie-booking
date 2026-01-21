@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import date, datetime
 
-class Movie_model(BaseModel):
+class Info_movie_model(BaseModel):
     id: int | None = None
     title: str | None = None
     description: str | None = None
@@ -11,6 +11,20 @@ class Movie_model(BaseModel):
     def get_fields(self) -> list:
         fields = []
         if self.id: fields.append("id")
+        if self.title: fields.append("title")
+        if self.description: fields.append("description")
+        if self.release: fields.append("release")
+        if self.genre_id: fields.append("genre_id")
+        return fields
+
+class Movie_model(BaseModel):
+    title: str
+    description: str
+    release: date
+    genre_id: int
+
+    def get_fields(self) -> list:
+        fields = []
         if self.title: fields.append("title")
         if self.description: fields.append("description")
         if self.release: fields.append("release")

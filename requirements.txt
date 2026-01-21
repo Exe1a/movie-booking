@@ -3,3 +3,6 @@ sqlalchemy
 bcrypt
 psycopg[binary]
 redis
+python-dotenv
+pyjwt
+pydantic
