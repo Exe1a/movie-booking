@@ -8,7 +8,7 @@ router = APIRouter(prefix="/db", tags=["database"])
 
 @router.post("/reset", summary="[WARNING] DELETE AND RECREATE ALL TABLES IN DATABASE")
 def db_reset(token: Annotated[str, Cookie()]):
-    Depends(admin_check(token))
+    admin_check(token)
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     return {"status": "Database was reset."}

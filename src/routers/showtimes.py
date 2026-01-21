@@ -22,7 +22,7 @@ def list_showtimes(showtime_filter: Annotated[Showtime_filter_model, Query()],
 def add_showtime(showtime: Annotated[Showtime_model, Query()],
                  token: Annotated[str, Cookie()],
                  session = Depends(get_session)):
-    Depends(admin_check(token))
+    admin_check(token)
     new_showtime = Showtimes(movie_id=showtime.movie_id,
                              time = showtime.time,
                              seats=showtime.seats)
@@ -34,7 +34,7 @@ def add_showtime(showtime: Annotated[Showtime_model, Query()],
 def delete_showtime(showtime_id: int,
                     token: Annotated[str, Cookie()],
                     session = Depends(get_session)):
-    Depends(admin_check(token))
+    admin_check(token)
     showtime = session.get(Showtimes, showtime_id)
     session.delete(showtime)
     session.commit()

@@ -10,14 +10,14 @@ router = APIRouter(prefix="/genre", tags=["genre"])
 @router.get("")
 def list_genres(token: Annotated[str, Cookie()],
                 session = Depends(get_session)):
-    Depends(admin_check(token))
+    admin_check(token)
     return session.scalars(select(Movies_Genres)).all()
 
 @router.post("")
 def add_genre(new_genre: str,
               token: Annotated[str, Cookie()],
               session = Depends(get_session)):
-    Depends(admin_check(token))
+    admin_check(token)
     genre = Movies_Genres(genre=new_genre)
     session.add(genre)
     session.commit()
@@ -28,7 +28,7 @@ def edit_genre(genre_id: int,
                genre_new_name: str,
                token: Annotated[str, Cookie()],
                session = Depends(get_session)):
-    Depends(admin_check(token))
+    admin_check(token)
     genre_obj = session.scalar(select(Movies_Genres).where(Movies_Genres.id == genre_id))
     genre_obj.genre = genre_new_name
     session.commit()
@@ -38,7 +38,7 @@ def edit_genre(genre_id: int,
 def delete_genre(genre_id: int,
                  token: Annotated[str, Cookie()],
                  session = Depends(get_session)):
-    Depends(admin_check(token))
+    admin_check(token)
     genre_to_delete = session.get(Movies_Genres, genre_id)
     session.delete(genre_to_delete)
     session.commit()

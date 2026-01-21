@@ -24,7 +24,7 @@ def get_movie(movie_filter: Annotated[Info_movie_model, Query()],
 def add_movie(new_movie: Annotated[Movie_model, Query()],
               token: Annotated[str, Cookie()],
               session = Depends(get_session)):
-    Depends(admin_check(token))
+    admin_check(token)
     movie = Movies(title = new_movie.title,
                    description = new_movie.description,
                    release = new_movie.release,
@@ -38,7 +38,7 @@ def edit_movie(movie_id: int,
                edited_movie: Annotated[Movie_model, Query()],
                token: Annotated[str, Cookie()],
                session = Depends(get_session)):
-    Depends(admin_check(token))
+    admin_check(token)
     fields = edited_movie.get_fields()
     movie_to_edit = session.get(Movies, movie_id)
     movie_to_edit.title = edited_movie.title if "title" in fields else movie_to_edit.title
@@ -52,7 +52,7 @@ def edit_movie(movie_id: int,
 def delete_movie(movie_id: int,
                  token: Annotated[str, Cookie()],
                  session = Depends(get_session)):
-    Depends(admin_check(token))
+    admin_check(token)
     movie_to_delete = session.get(Movies, movie_id)
     session.delete(movie_to_delete)
     session.commit()
