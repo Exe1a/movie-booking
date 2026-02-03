@@ -3,13 +3,15 @@ from sqlalchemy import select
 from typing import Annotated
 from src.database import get_session
 from src.models.database import Movies
-from src.models.pydantic_models import Movie_model, Info_movie_model
+from src.models.pydantic_models import MovieModel, InfoMovieModel
 from src.utils import admin_check
 
-router = APIRouter(prefix="/movie", tags=["movie"])
+router = APIRouter(prefix="/movie",
+                   tags=["movie"])
 
-@router.post("",summary="Get all movies or some movies by id/title/description/release/genre")
-def get_movie(movie_filter: Annotated[Info_movie_model, Query()],
+@router.post(path="",
+             summary="Get all movies or some movies by id/title/description/release/genre")
+def get_movie(movie_filter: Annotated[InfoMovieModel, Query()],
               session = Depends(get_session)):
     fields = movie_filter.get_fields()
     whr = []
@@ -20,8 +22,9 @@ def get_movie(movie_filter: Annotated[Info_movie_model, Query()],
     if "genre_id" in fields: whr.append(Movies.genre_id == movie_filter.genre_id)
     return session.scalars(select(Movies).where(*whr)).all()
 
-@router.post("/add", summary="Add new movie in database")
-def add_movie(new_movie: Annotated[Movie_model, Query()],
+@router.post(path="/add",
+             summary="Add new movie in database")
+def add_movie(new_movie: Annotated[MovieModel, Query()],
               token: Annotated[str, Cookie()],
               session = Depends(get_session)):
     admin_check(token)
@@ -33,9 +36,9 @@ def add_movie(new_movie: Annotated[Movie_model, Query()],
     session.commit()
     return {"result": "movie was added"}
 
-@router.patch("/{movie_id}")
+@router.patch(path="/{movie_id}")
 def edit_movie(movie_id: int,
-               edited_movie: Annotated[Movie_model, Query()],
+               edited_movie: Annotated[MovieModel, Query()],
                token: Annotated[str, Cookie()],
                session = Depends(get_session)):
     admin_check(token)
@@ -48,7 +51,7 @@ def edit_movie(movie_id: int,
     session.commit()
     return {"result" : "movie was edited"}
 
-@router.delete("/{movie_id}")
+@router.delete(path="/{movie_id}")
 def delete_movie(movie_id: int,
                  token: Annotated[str, Cookie()],
                  session = Depends(get_session)):

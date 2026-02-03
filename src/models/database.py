@@ -20,13 +20,13 @@ class Movies(Base):
     release: Mapped[date] = mapped_column(nullable=True)
     genre_id: Mapped[int] = mapped_column(ForeignKey("movies_genres.id", ondelete="CASCADE"))
 
-class Movies_Genres(Base):
+class MoviesGenres(Base):
     __tablename__ = "movies_genres"
     id: Mapped[int] = mapped_column(primary_key=True)
     genre: Mapped[str] = mapped_column(String(32), unique=True)
 
-class Showtimes(Base):
-    __tablename__ = "showtimes"
+class FilmSession(Base):
+    __tablename__ = "film_session"
     id: Mapped[int] = mapped_column(primary_key=True)
     movie_id: Mapped[str] = mapped_column(ForeignKey("movies.id", ondelete="CASCADE"))
     time: Mapped[datetime]
@@ -37,5 +37,5 @@ class Showtimes(Base):
 class Reservation(Base):
     __tablename__ = "reservation"
     id: Mapped[int] = mapped_column(primary_key=True)
-    showtime_id: Mapped[int] = mapped_column(ForeignKey("showtimes.id", ondelete="CASCADE"))
+    filmsession_id: Mapped[int] = mapped_column(ForeignKey("film_session.id", ondelete="CASCADE"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))

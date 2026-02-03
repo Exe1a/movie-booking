@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import date, datetime
 
-class Info_movie_model(BaseModel):
+class InfoMovieModel(BaseModel):
     id: int | None = None
     title: str | None = None
     description: str | None = None
@@ -17,7 +17,7 @@ class Info_movie_model(BaseModel):
         if self.genre_id: fields.append("genre_id")
         return fields
 
-class Movie_model(BaseModel):
+class MovieModel(BaseModel):
     title: str
     description: str
     release: date
@@ -31,7 +31,7 @@ class Movie_model(BaseModel):
         if self.genre_id: fields.append("genre_id")
         return fields
     
-class Showtime_filter_model(BaseModel):
+class FilmSessionFilterModel(BaseModel):
     id: int | None = None
     movie_id: int | None = None
     time: datetime | None = None
@@ -43,11 +43,11 @@ class Showtime_filter_model(BaseModel):
         if self.time: fields.append("time")
         return fields
     
-class Showtime_model(BaseModel):
+class FilmSessionModel(BaseModel):
     movie_id: int
     time: datetime
     seats: int = Field(gt=0)
 
-class User_form(BaseModel):
+class UserForm(BaseModel):
     login: str
     password: str

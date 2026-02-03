@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import src.routers.database as db
 import src.routers.movie as movie
 import src.routers.genre as genre
-import src.routers.showtimes as showtimes
+import src.routers.flm_session as showtimes
 import src.routers.reservation as reservation
 import src.routers.user as user
 

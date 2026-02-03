@@ -5,7 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from src.models.database import Users
 from src.database import engine
-from fastapi import HTTPException
+from fastapi import HTTPException, Cookie
+from typing import Annotated
 
 secret_key = str(dotenv_values(".env").get("SECRET_JWT_KEY"))
 algorithm = "HS256"
@@ -15,13 +16,13 @@ def generate_token(user_id) -> str:
                   key=secret_key,
                   algorithm=algorithm)
 
-def get_user_id(token: str):
+def get_user_id(token: str) -> int:
     decoded_token = decode(jwt=token,
                            key=secret_key,
                            algorithms=algorithm)
     return decoded_token.get("user_id")
 
-def admin_check(token: str | bytes) -> None:
+def admin_check(token: Annotated[str | bytes, Cookie()]) -> None:
     user_id = get_user_id(token)
     with Session(engine) as session:
         admin = session.scalar(select(Users.admin).where(Users.id == user_id))
