@@ -25,8 +25,8 @@ def add_film_session(film_session: Annotated[FilmSessionModel, Query()],
                      session = Depends(get_session)):
     admin_check(token)
     new_film_session = FilmSession(movie_id=film_session.movie_id,
-                               time = film_session.time,
-                               seats=film_session.seats)
+                                   time = film_session.time,
+                                   seats=film_session.seats)
     session.add(new_film_session)
     session.commit()
     return {"result": "Film session was added"}

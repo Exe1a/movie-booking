@@ -16,14 +16,14 @@ def list_reservation(token: Annotated[str, Cookie()],
     return session.scalars(select(Reservation).where(Reservation.user_id == user_id)).all()
 
 @router.post("/add")
-def add_reservation(filmsession_id: int,
+def add_reservation(film_session_id: int,
                     token: Annotated[str, Cookie()],
                     session = Depends(get_session)):
     user_id = get_user_id(token)
-    new_reservation = Reservation(filmsession_id = filmsession_id,
+    new_reservation = Reservation(film_session_id = film_session_id,
                                   user_id = user_id)
     session.add(new_reservation)
-    showtime = session.get(FilmSession, filmsession_id)
+    showtime = session.get(FilmSession, film_session_id)
     showtime.reserved += 1
     session.commit()
     return {"result" : "Film session was added"}
@@ -36,7 +36,7 @@ def delete_reservation(reservation_id: int,
     if get_user_id(token) != reservation.user_id:
         raise HTTPException(403, "It's not your reservation")
     session.delete(reservation)
-    film_session = session.get(FilmSession, reservation.filmsession_id)
+    film_session = session.get(FilmSession, reservation.film_session_id)
     film_session.reserved -= 1
     session.commit()
     return {"result": "Reservation was deleted"}
