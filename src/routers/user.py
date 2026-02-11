@@ -4,7 +4,7 @@ from typing import Annotated
 from src.database import get_session
 from src.models.database import Users
 from src.models.pydantic_models import UserForm
-from src.utils import generate_token, admin_check, get_user_id, hash_password, check_password
+from src.auth import generate_token, admin_check, get_user_id, hash_password, check_password
 
 router = APIRouter(prefix="/user",
                    tags=["user"])

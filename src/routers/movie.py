@@ -4,7 +4,7 @@ from typing import Annotated
 from src.database import get_session
 from src.models.database import Movies
 from src.models.pydantic_models import MovieModel, InfoMovieModel
-from src.utils import admin_check
+from src.auth import admin_check
 
 router = APIRouter(prefix="/movie",
                    tags=["movie"])

@@ -4,7 +4,7 @@ from fastapi.params import Depends
 from sqlalchemy import select
 from src.database import get_session
 from src.models.database import Reservation, FilmSession
-from src.utils import get_user_id
+from src.auth import get_user_id
 
 router = APIRouter(prefix="/reservation",
                    tags=["reservation"])

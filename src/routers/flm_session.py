@@ -4,7 +4,7 @@ from typing import Annotated
 from src.models.pydantic_models import FilmSessionFilterModel, FilmSessionModel
 from src.models.database import FilmSession
 from src.database import get_session
-from src.utils import admin_check
+from src.auth import admin_check
 
 router = APIRouter(prefix="/film-session",
                    tags=["film-session"])
