@@ -6,8 +6,7 @@ from src.database import get_session
 from src.utils import admin_check
 
 router = APIRouter(prefix="/genre",
-                   tags=["genre"],
-                   )
+                   tags=["genre"])
 
 @router.get(path="")
 def list_genres(token: Annotated[str, Cookie()],
