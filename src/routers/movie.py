@@ -1,30 +1,62 @@
-from fastapi import APIRouter, Query, Depends, Cookie
+from fastapi import APIRouter, Depends, Cookie
 from sqlalchemy import select
 from typing import Annotated
+import json
 from src.database import get_session
 from src.models.database import Movies
-from src.models.pydantic_models import MovieModel, InfoMovieModel
+from src.models.pydantic_models import EditedMovieModel, MovieFilterModel, NewMovieModel
 from src.auth import admin_check
+import src.cache as cache
 
 router = APIRouter(prefix="/movie",
                    tags=["movie"])
 
-@router.post(path="",
-             summary="Get all movies or some movies by id/title/description/release/genre")
-def get_movie(movie_filter: Annotated[InfoMovieModel, Query()],
-              session = Depends(get_session)):
-    fields = movie_filter.get_fields()
-    whr = []
-    if "id" in fields: whr.append(Movies.id == movie_filter.id)
-    if "title" in fields: whr.append(Movies.title == movie_filter.title)
-    if "description" in fields: whr.append(Movies.description == movie_filter.description)
-    if "release" in fields: whr.append(Movies.release == movie_filter.release)
-    if "genre_id" in fields: whr.append(Movies.genre_id == movie_filter.genre_id)
-    return session.scalars(select(Movies).where(*whr)).all()
+@router.get(path="")
+def get_all_movie(session=Depends(get_session)):
+    cached_data = cache.redis.hgetall("movie:all").items()
+    if cached_data:
+        return {movie_id: json.loads(fields) for movie_id, fields in cached_data}
+    all_movie_data = session.scalars(select(Movies)).all()
+    all_movie_prepared_data = {f"{movie.id}" : {"title": movie.title,
+                                                "description": movie.description,
+                                                "release": str(movie.release),
+                                                "genre_id": str(movie.genre_id)} for movie in all_movie_data}
+    cache.redis.hset(name="movie:all",
+                     mapping={f"{movie_id}": json.dumps(fields) for movie_id, fields in all_movie_prepared_data.items()})
+    return all_movie_prepared_data
+    
 
-@router.post(path="/add",
-             summary="Add new movie in database")
-def add_movie(new_movie: Annotated[MovieModel, Query()],
+@router.get(path="/{id}")
+def get_movie_by_id(movie_id: int,
+                    session = Depends(get_session)):
+    cached_data = cache.redis.hgetall(name=f"movie:{movie_id}")
+    if cached_data:
+        return cached_data
+    movie_data = session.scalar(select(Movies).where(Movies.id == movie_id))
+    movie_prepared_data = {"title": movie_data.title,
+                           "description": movie_data.description,
+                           "release": str(movie_data.release),
+                           "genre_id": str(movie_data.genre_id)}
+    cache.redis.hset(name=f"movie:{movie_id}",
+                     mapping=movie_prepared_data)
+    return movie_prepared_data
+    
+@router.post(path="")
+def get_movie_with_filter(movie_filter: MovieFilterModel,
+                          session = Depends(get_session)):
+    whr = []
+    if movie_filter.title: whr.append(Movies.title == movie_filter.title)
+    if movie_filter.release: whr.append(Movies.release == movie_filter.release)
+    if movie_filter.genre_id: whr.append(Movies.genre_id == movie_filter.genre_id)
+    movies_data = session.scalars(select(Movies).where(*whr)).all()
+    movies_data_prepared = {f"{movie.id}": {"title": movie.title,
+                                            "description": movie.description,
+                                            "release": str(movie.release),
+                                            "genre_id": str(movie.genre_id)} for movie in movies_data}
+    return movies_data_prepared
+
+@router.post(path="/add")
+def add_movie(new_movie: NewMovieModel,
               token: Annotated[str, Cookie()],
               session = Depends(get_session)):
     admin_check(token)
@@ -34,21 +66,26 @@ def add_movie(new_movie: Annotated[MovieModel, Query()],
                    genre_id = new_movie.genre_id)
     session.add(movie)
     session.commit()
+    keys_to_delete = cache.redis.keys("movie:*")
+    if keys_to_delete:
+        cache.redis.delete(*keys_to_delete)
     return {"result": "movie was added"}
 
 @router.patch(path="/{movie_id}")
 def edit_movie(movie_id: int,
-               edited_movie: Annotated[MovieModel, Query()],
+               edited_movie: EditedMovieModel,
                token: Annotated[str, Cookie()],
                session = Depends(get_session)):
     admin_check(token)
-    fields = edited_movie.get_fields()
     movie_to_edit = session.get(Movies, movie_id)
-    movie_to_edit.title = edited_movie.title if "title" in fields else movie_to_edit.title
-    movie_to_edit.description = edited_movie.description if "description" in fields else movie_to_edit.description
-    movie_to_edit.release = edited_movie.release if "release" in fields else movie_to_edit.release
-    movie_to_edit.genre_id = edited_movie.genre_id if "genre_id" in fields else movie_to_edit.genre_id
+    if edited_movie.title: movie_to_edit.title = edited_movie.title
+    if edited_movie.description: movie_to_edit.description = edited_movie.description
+    if edited_movie.release: movie_to_edit.release = edited_movie.release
+    if edited_movie.genre_id: movie_to_edit.genre_id = edited_movie.genre_id
     session.commit()
+    keys_to_delete = cache.redis.keys("movie:*")
+    if keys_to_delete:
+        cache.redis.delete(*keys_to_delete)
     return {"result" : "movie was edited"}
 
 @router.delete(path="/{movie_id}")
@@ -59,4 +96,7 @@ def delete_movie(movie_id: int,
     movie_to_delete = session.get(Movies, movie_id)
     session.delete(movie_to_delete)
     session.commit()
+    keys_to_delete = cache.redis.keys("movie:*")
+    if keys_to_delete:
+        cache.redis.delete(*keys_to_delete)
     return {"result": "movie was deleted"}

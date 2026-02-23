@@ -1,35 +1,19 @@
 from pydantic import BaseModel, Field
 from datetime import date, datetime
 
-class InfoMovieModel(BaseModel):
-    id: int | None = None
+class MovieFilterModel(BaseModel):
     title: str | None = None
-    description: str | None = None
     release: date | None = None
     genre_id: int | None = None
 
-    def get_fields(self) -> list:
-        fields = []
-        if self.id: fields.append("id")
-        if self.title: fields.append("title")
-        if self.description: fields.append("description")
-        if self.release: fields.append("release")
-        if self.genre_id: fields.append("genre_id")
-        return fields
+class EditedMovieModel(MovieFilterModel):
+    description: str | None = None
 
-class MovieModel(BaseModel):
+class NewMovieModel(BaseModel):
     title: str
     description: str
     release: date
     genre_id: int
-
-    def get_fields(self) -> list:
-        fields = []
-        if self.title: fields.append("title")
-        if self.description: fields.append("description")
-        if self.release: fields.append("release")
-        if self.genre_id: fields.append("genre_id")
-        return fields
     
 class FilmSessionFilterModel(BaseModel):
     id: int | None = None

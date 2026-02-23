@@ -15,7 +15,7 @@ def list_genres(session = Depends(get_session)):
     if cached_data:
         return cached_data
     list_genres_data = session.scalars(select(MoviesGenres)).all()
-    list_genres_prepared_data = {f"{genre.id}": genre.genre for genre in list_genres_data}
+    list_genres_prepared_data = {genre.id: genre.genre for genre in list_genres_data}
     cache.redis.hset(name="list_genres",
                      mapping=list_genres_prepared_data)
     return list_genres_prepared_data
