@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from src.database import engine, database_reset_key
-from src.models.database import Base
+from src.database.orm import engine, database_reset_key
+from src.database.models import Base
 
 router = APIRouter(prefix="/db",
                    tags=["database"])

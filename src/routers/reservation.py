@@ -3,10 +3,10 @@ from fastapi import APIRouter, Cookie, HTTPException
 from fastapi.params import Depends
 from sqlalchemy import select
 import json
-from src.database import get_session
-from src.models.database import Reservation, FilmSession
+from src.database.orm import get_session
+from src.database.models import Reservation, FilmSession
 from src.auth import get_user_id
-import src.cache as cache
+import src.database.cache as cache
 
 router = APIRouter(prefix="/reservation",
                    tags=["reservation"])

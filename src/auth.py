@@ -3,10 +3,10 @@ from bcrypt import hashpw, gensalt, checkpw
 from dotenv import dotenv_values
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from src.models.database import Users
-from src.database import engine
 from fastapi import HTTPException, Cookie
 from typing import Annotated
+from src.database.models import Users
+from src.database.orm import engine
 
 secret_key = str(dotenv_values(".env").get("SECRET_JWT_KEY"))
 algorithm = "HS256"

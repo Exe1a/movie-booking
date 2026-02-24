@@ -1,16 +1,16 @@
-from fastapi import APIRouter, Query, Depends, Cookie
+from fastapi import APIRouter, Depends, Cookie
 from sqlalchemy import select
 from typing import Annotated
-from src.models.pydantic_models import FilmSessionFilterModel, FilmSessionModel
-from src.models.database import FilmSession
-from src.database import get_session
+from src.schemas.film_session import FilmSessionFilterModel, FilmSessionModel
+from src.database.models import FilmSession
+from src.database.orm import get_session
 from src.auth import admin_check
 
 router = APIRouter(prefix="/film-session",
                    tags=["film-session"])
 
 @router.post(path="")
-def list_film_sessions(film_session_filter: Annotated[FilmSessionFilterModel, Query()],
+def list_film_sessions(film_session_filter: FilmSessionFilterModel,
                        session = Depends(get_session)):
     whr = []
     if film_session_filter.id: whr.append(FilmSession.id == film_session_filter.id)
@@ -19,7 +19,7 @@ def list_film_sessions(film_session_filter: Annotated[FilmSessionFilterModel, Qu
     return session.scalars(select(FilmSession).where(*whr)).all()
     
 @router.post(path="/add")
-def add_film_session(film_session: Annotated[FilmSessionModel, Query()],
+def add_film_session(film_session: FilmSessionModel,
                      token: Annotated[str, Cookie()],
                      session = Depends(get_session)):
     admin_check(token)

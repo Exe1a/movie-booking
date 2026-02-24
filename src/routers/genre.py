@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Cookie
 from sqlalchemy import select
 from typing import Annotated
-from src.models.database import MoviesGenres
-from src.database import get_session
+from src.database.models import MoviesGenres
+from src.database.orm import get_session
 from src.auth import admin_check
-import src.cache as cache
+import src.database.cache as cache
 
 router = APIRouter(prefix="/genre",
                    tags=["genre"])

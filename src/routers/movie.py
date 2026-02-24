@@ -2,17 +2,17 @@ from fastapi import APIRouter, Depends, Cookie
 from sqlalchemy import select
 from typing import Annotated
 import json
-from src.database import get_session
-from src.models.database import Movies
-from src.models.pydantic_models import EditedMovieModel, MovieFilterModel, NewMovieModel
+from database.orm import get_session
+from database.models import Movies
+from src.schemas.movie import EditedMovieModel, MovieFilterModel, NewMovieModel
 from src.auth import admin_check
-import src.cache as cache
+import database.cache as cache
 
 router = APIRouter(prefix="/movie",
                    tags=["movie"])
 
 @router.get(path="")
-def get_all_movie(session=Depends(get_session)):
+def list_movies(session=Depends(get_session)):
     cached_data = cache.redis.hgetall("movie:all").items()
     if cached_data:
         return {movie_id: json.loads(fields) for movie_id, fields in cached_data}
@@ -27,7 +27,7 @@ def get_all_movie(session=Depends(get_session)):
     
 
 @router.get(path="/{id}")
-def get_movie_by_id(movie_id: int,
+def movie_by_id(movie_id: int,
                     session = Depends(get_session)):
     cached_data = cache.redis.hgetall(name=f"movie:{movie_id}")
     if cached_data:
@@ -42,7 +42,7 @@ def get_movie_by_id(movie_id: int,
     return movie_prepared_data
     
 @router.post(path="")
-def get_movie_with_filter(movie_filter: MovieFilterModel,
+def list_movies_with_filters(movie_filter: MovieFilterModel,
                           session = Depends(get_session)):
     whr = []
     if movie_filter.title: whr.append(Movies.title == movie_filter.title)
