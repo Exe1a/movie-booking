@@ -12,11 +12,10 @@ router = APIRouter(prefix="/film-session",
 @router.post(path="")
 def list_film_sessions(film_session_filter: Annotated[FilmSessionFilterModel, Query()],
                        session = Depends(get_session)):
-    fields = film_session_filter.get_fields()
     whr = []
-    if "id" in fields: whr.append(FilmSession.id == film_session_filter.id)
-    if "movie_id" in fields: whr.append(FilmSession.movie_id == film_session_filter.movie_id)
-    if "time" in fields: whr.append(FilmSession.time == film_session_filter.time)
+    if film_session_filter.id: whr.append(FilmSession.id == film_session_filter.id)
+    if film_session_filter.movie_id: whr.append(FilmSession.movie_id == film_session_filter.movie_id)
+    if film_session_filter.time: whr.append(FilmSession.time == film_session_filter.time)
     return session.scalars(select(FilmSession).where(*whr)).all()
     
 @router.post(path="/add")
@@ -32,9 +31,9 @@ def add_film_session(film_session: Annotated[FilmSessionModel, Query()],
     return {"result": "Film session was added"}
 
 @router.delete(path="/{film_session_id}")
-def delete_showtime(film_session_id: int,
-                    token: Annotated[str, Cookie()],
-                    session = Depends(get_session)):
+def delete_film_session(film_session_id: int,
+                        token: Annotated[str, Cookie()],
+                        session = Depends(get_session)):
     admin_check(token)
     film_session = session.get(FilmSession, film_session_id)
     session.delete(film_session)
