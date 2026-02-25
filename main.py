@@ -5,8 +5,9 @@ import src.routers.genre as genre
 import src.routers.flm_session as showtimes
 import src.routers.reservation as reservation
 import src.routers.user as user
+from src.database.cache import lifespan
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(db.router)
 app.include_router(movie.router)

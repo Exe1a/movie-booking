@@ -2,6 +2,8 @@ from typing import Annotated
 from fastapi import APIRouter, Cookie, HTTPException
 from fastapi.params import Depends
 from sqlalchemy import select
+from sqlalchemy.orm import Session
+from redis import Redis
 import json
 from src.database.orm import get_session
 from src.database.models import Reservation, FilmSession
@@ -13,7 +15,7 @@ router = APIRouter(prefix="/reservation",
 
 @router.post("")
 def list_reservation(token: Annotated[str, Cookie()],
-                     session = Depends(get_session)):
+                     session: Session = Depends(get_session)):
     user_id = get_user_id(token)
     cached_data = cache.redis.hgetall(f"reservation:{user_id}").items()
     if cached_data:
@@ -29,7 +31,7 @@ def list_reservation(token: Annotated[str, Cookie()],
 @router.post("/add")
 def add_reservation(film_session_id: int,
                     token: Annotated[str, Cookie()],
-                    session = Depends(get_session)):
+                    session: Session = Depends(get_session)):
     user_id = get_user_id(token)
     new_reservation = Reservation(film_session_id = film_session_id,
                                   user_id = user_id)
@@ -43,7 +45,7 @@ def add_reservation(film_session_id: int,
 @router.delete("/{reservation_id}")
 def delete_reservation(reservation_id: int,
                        token: Annotated[str, Cookie()],
-                       session = Depends(get_session)):
+                       session: Session = Depends(get_session)):
     user_id = get_user_id(token)
     reservation = session.get(Reservation, reservation_id)
     if user_id != reservation.user_id:

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query, Response, Cookie, Depends, HTTPException
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 from typing import Annotated
 from src.database.orm import get_session
 from src.database.models import Users
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/user",
 @router.post(path="/registration")
 def registration(user: Annotated[UserForm, Query()],
                  response: Response,
-                 session = Depends(get_session)):
+                 session: Session = Depends(get_session)):
     if session.scalar(select(Users.login).where(Users.login == user.login)):
         raise HTTPException(409, "Login already exist")
     hash_pd = hash_password(user.password)
@@ -27,7 +28,7 @@ def registration(user: Annotated[UserForm, Query()],
 @router.post(path="/login")
 def login_user(user_data: Annotated[UserForm, Query()],
                response: Response,
-               session = Depends(get_session)):
+               session: Session = Depends(get_session)):
     error = {"error": "login or password incorrect"}
     user_from_db = session.scalar(select(Users).where(Users.login == user_data.login))
     if user_from_db.login == "":
@@ -41,7 +42,7 @@ def login_user(user_data: Annotated[UserForm, Query()],
 def change_password(user_id: int,
                     new_password: str,
                     token: Annotated[str, Cookie()],
-                    session = Depends(get_session)):
+                    session: Session = Depends(get_session)):
     if get_user_id(token) != user_id:
         return {"error": "You can change password only your account"}
     user = session.get(Users, user_id)
@@ -52,7 +53,7 @@ def change_password(user_id: int,
 @router.delete(path="/{user_id}")
 def delete_user(user_id: int,
                 token: Annotated[str, Cookie()],
-                session = Depends(get_session)):
+                session: Session = Depends(get_session)):
     admin_check(token)
     session.delete(session.get(Users, user_id))
     session.commit()
